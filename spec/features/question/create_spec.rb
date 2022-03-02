@@ -7,6 +7,9 @@ feature 'User can create question', %q{
 } do
 
   given(:user) { create(:user) }
+  given(:questions) { create_list(:question, 3, user_id: user.id) }
+
+
   describe 'Authenticated user' do
     background do
       sign_in(user)
@@ -38,5 +41,15 @@ feature 'User can create question', %q{
     click_on 'Ask question'
 
     expect(page).to have_content 'You need to sign in or sign up before continuing.'
+  end
+
+  scenario 'List questions' do
+    questions
+
+    visit questions_path
+
+    questions.each do |question|
+      expect(page).to have_content question.title
+    end
   end
 end

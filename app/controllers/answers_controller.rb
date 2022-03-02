@@ -1,4 +1,5 @@
 class AnswersController < ApplicationController
+  before_action :authenticate_user!
   before_action :find_question, only: %i[ new create ]
   before_action :load_answer, only: %i[ show edit update destroy]
 
@@ -8,16 +9,22 @@ class AnswersController < ApplicationController
   def edit
   end
 
+  def destroy
+    @answer.destroy
+    redirect_to question_path(@answer.question)
+  end
+
   def new
     @answer = @question.answers.new
   end
 
   def create
     @answer = @question.answers.new(answer_params)
+    @answer.user_id = current_user.id
     if @answer.save
-      redirect_to @answer
+      redirect_to @answer, notice: 'Your answer successfully created.'
     else
-      render :new
+      redirect_to @question, notice: "Answer can't be blank."
     end
 
   end
@@ -30,10 +37,7 @@ class AnswersController < ApplicationController
     end
   end
 
-  def destroy
-    @answer.destroy
-    redirect_to question_path(@answer.question)
-  end
+
 
   private
 
@@ -46,6 +50,7 @@ class AnswersController < ApplicationController
   end
 
   def answer_params
+    puts("+++++++++++++++++")
     params.require(:answer).permit(:text, :correct)
   end
 end

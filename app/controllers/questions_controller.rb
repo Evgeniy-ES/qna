@@ -1,4 +1,5 @@
 class QuestionsController < ApplicationController
+  before_action :authenticate_user!
   before_action :authenticate_user!, except: %i[ index show ]
   before_action :load_question, only: %i[ show edit destroy ]
 
@@ -18,6 +19,7 @@ class QuestionsController < ApplicationController
 
   def create
     @question = Question.new(question_params)
+    @question.user_id = current_user.id
     if @question.save
       redirect_to @question, notice: 'Your question successfully created.'
     else
@@ -35,8 +37,10 @@ class QuestionsController < ApplicationController
   end
 
   def destroy
-    @question.destroy
-    redirect_to questions_path
+    if current_user.id == @question.user_id
+      @question.destroy
+      redirect_to questions_path
+    end
   end
 
   private

@@ -1,10 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe AnswersController, type: :controller do
-  let(:question) { create(:question) }
-  let(:answer) { create(:answer, question: question) }
+  let(:user) { create(:user) }
+  let(:question) { create(:question, user_id: user.id) }
+  let(:answer) { create(:answer, question: question, user_id: user.id) }
+  before { sign_in(user) }
 
   describe 'GET #show ' do
+
     before { get :show, params: { question_id: question, id: answer } }
 
     it 'assign the requested answer to @answer' do
@@ -57,7 +60,7 @@ RSpec.describe AnswersController, type: :controller do
       end
       it 're-renders new view' do
         post :create, params: { question_id: question, answer: attributes_for(:answer, :invalid) }
-        expect(response).to render_template :new
+        expect(response).to redirect_to question
       end
     end
 
@@ -89,7 +92,7 @@ RSpec.describe AnswersController, type: :controller do
       it 'does not change answer' do
         answer.reload
 
-        expect(answer.text).to eq 'MyText'
+        expect(answer.text).to eq 'My answer'
       end
       it 're-renders edit view' do
         expect(response).to render_template :edit
@@ -98,7 +101,7 @@ RSpec.describe AnswersController, type: :controller do
   end
 
   describe 'DELETE #destroy' do
-    let!(:answer) { create(:answer, question: question) }
+    let!(:answer) { create(:answer, question: question, user_id: user.id) }
     it 'deletes the answer' do
       expect{ delete :destroy, params: { question_id: question, id: answer } }.to change(question.answers, :count).by(-1)
     end
