@@ -2,10 +2,10 @@ require 'rails_helper'
 
 RSpec.describe QuestionsController, type: :controller do
   let(:user) { create(:user) }
-  let(:question) { create(:question, user_id: user.id) }
+  let(:question) { create(:question, author: user) }
 
   describe 'GET #index' do
-    let(:questions) { create_list(:question, 3, user_id: user.id) }
+    let(:questions) { create_list(:question, 3, author: user) }
 
     before  { get :index }
     it 'populates an array of all questions' do
@@ -51,10 +51,10 @@ RSpec.describe QuestionsController, type: :controller do
 
     context 'with valid atributes' do
       it 'saves a new question in the database' do
-        expect { post :create, params: { question: attributes_for(:question), user_id: user.id } }.to change(Question, :count).by(1)
+        expect { post :create, params: { question: attributes_for(:question), author: user } }.to change(Question, :count).by(1)
       end
       it 'redirect to show view' do
-        post :create, params: { question: attributes_for(:question), user_id: user.id }
+        post :create, params: { question: attributes_for(:question), author: user }
         expect(response).to redirect_to assigns(:question)
       end
     end
@@ -109,16 +109,29 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'DELETE #destroy' do
-    before { login(user) }
     let!(:question) { create(:question, user_id: user.id) }
-    it 'deletes the question' do
-      expect { expect { delete :destroy, params: { id: question } }.to change(Question, :count).by(-1) }
+
+    context 'The author deletes his question' do
+      before { login(user) }
+      it 'deletes the question' do
+        expect { expect { delete :destroy, params: { id: question } }.to change(Question, :count).by(-1) }
+      end
+
+      it 'redirects to index' do
+        delete :destroy, params: { id: question }
+        expect(response).to redirect_to questions_path
+      end
     end
 
-    it 'redirects to index' do
-      delete :destroy, params: { id: question }
-      expect(response).to redirect_to questions_path
+    context 'The user deletes not his question' do
+      let(:not_author) { create(:user) }
+      before { login(not_author) }
+
+      it 'deletes the question' do
+        expect { expect { delete :destroy, params: { id: question } }.to change(Question, :count).by(0) }
+      end
     end
+
 
   end
 end

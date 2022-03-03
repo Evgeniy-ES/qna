@@ -4,15 +4,14 @@ feature 'Author can delete his question', %q{
 
 } do
 
-  given(:user) { create(:user) }
-  given(:author) { create(:user) }
-  given(:question) { create(:question, user_id: author.id) }
+  given!(:user) { create(:user) }
+  given!(:author) { create(:user) }
+  given!(:question) { create(:question, author: author) }
 
   describe 'Authenticated user' do
     scenario 'Author can delete his question' do
       sign_in(author)
       visit question_path(question)
-      expect(page).to have_content question.title
 
       click_on 'Delete the question'
       expect(page).to_not have_content question.title

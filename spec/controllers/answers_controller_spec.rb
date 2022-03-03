@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe AnswersController, type: :controller do
   let(:user) { create(:user) }
-  let(:question) { create(:question, user_id: user.id) }
-  let(:answer) { create(:answer, question: question, user_id: user.id) }
+  let(:question) { create(:question, author: user) }
+  let(:answer) { create(:answer, question: question, author: user) }
   before { sign_in(user) }
 
   describe 'GET #show ' do
@@ -102,14 +102,29 @@ RSpec.describe AnswersController, type: :controller do
 
   describe 'DELETE #destroy' do
     let!(:answer) { create(:answer, question: question, user_id: user.id) }
-    it 'deletes the answer' do
-      expect{ delete :destroy, params: { question_id: question, id: answer } }.to change(question.answers, :count).by(-1)
+
+    context 'The author deletes his answer' do
+      before { login(user) }
+      it 'deletes the answer' do
+        expect{ delete :destroy, params: { question_id: question, id: answer } }.to change(question.answers, :count).by(-1)
+      end
+
+      it 'redirect to index' do
+        delete :destroy, params: { question_id: question, id: answer }
+        expect(response).to redirect_to answer.question
+      end
     end
 
-    it 'redirect to index' do
-      delete :destroy, params: { question_id: question, id: answer }
-      expect(response).to redirect_to answer.question
+    context 'The user deletes not his answer' do
+      let(:not_author) { create(:user) }
+      before { login(not_author) }
+
+      it 'deletes the answer' do
+        expect{ delete :destroy, params: { question_id: question, id: answer } }.to change(question.answers, :count).by(0)
+      end
     end
+
+
 
   end
 

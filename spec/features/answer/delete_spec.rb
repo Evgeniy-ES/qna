@@ -6,8 +6,8 @@ feature 'Author can delete his answer', %q{
 
   given!(:user) { create(:user) }
   given!(:author) { create(:user) }
-  given!(:question) { create(:question, user_id: author.id) }
-  given!(:answer) { create(:answer, question_id: question.id, user_id: author.id) }
+  given!(:question) { create(:question, author: author) }
+  given!(:answer) { create(:answer, question: question, author: author) }
 
   describe 'Authenticated user' do
     scenario 'Author can delete his question' do

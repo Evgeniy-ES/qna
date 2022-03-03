@@ -4,8 +4,8 @@ feature 'User can create answer', %q{
   To give an answer to the question
 } do
 
-  given(:user) { create(:user) }
-  given(:question) { create(:question, user_id: user.id) }
+  given!(:user) { create(:user) }
+  given!(:question) { create(:question, author: user) }
 
   describe 'Authenticated user' do
     background do

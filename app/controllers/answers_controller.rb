@@ -1,19 +1,12 @@
 class AnswersController < ApplicationController
   before_action :authenticate_user!
   before_action :find_question, only: %i[ new create ]
-  before_action :load_answer, only: %i[ show edit update destroy]
+  before_action :load_answer, only: %i[ show edit update destroy ]
 
   def show
   end
 
   def edit
-  end
-
-  def destroy
-    if current_user.id == @answer.user_id
-      @answer.destroy
-      redirect_to question_path(@answer.question)
-    end
   end
 
   def new
@@ -22,7 +15,7 @@ class AnswersController < ApplicationController
 
   def create
     @answer = @question.answers.new(answer_params)
-    @answer.user_id = current_user.id
+    @answer.author = current_user
     if @answer.save
       redirect_to @answer, notice: 'Your answer successfully created.'
     else
@@ -39,7 +32,12 @@ class AnswersController < ApplicationController
     end
   end
 
-
+  def destroy
+    if User.author_of?(current_user, @answer)
+      @answer.destroy
+      redirect_to question_path(@answer.question)
+    end
+  end
 
   private
 
