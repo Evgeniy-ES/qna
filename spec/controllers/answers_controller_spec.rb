@@ -50,7 +50,7 @@ RSpec.describe AnswersController, type: :controller do
       end
       it 'redirects to show view' do
         post :create, params: { question_id: question, answer: attributes_for(:answer) }
-        expect(response).to redirect_to assigns(:answer)
+        expect(response).to redirect_to assigns(:question)
       end
     end
 
@@ -120,7 +120,8 @@ RSpec.describe AnswersController, type: :controller do
       before { login(not_author) }
 
       it 'deletes the answer' do
-        expect{ delete :destroy, params: { question_id: question, id: answer } }.to change(question.answers, :count).by(0)
+        expect{ delete :destroy, params: { question_id: question, id: answer } }.to_not change(question.answers, :count)
+        expect(response).to have_http_status(:forbidden)
       end
     end
 

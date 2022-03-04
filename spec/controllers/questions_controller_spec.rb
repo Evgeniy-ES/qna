@@ -114,7 +114,7 @@ RSpec.describe QuestionsController, type: :controller do
     context 'The author deletes his question' do
       before { login(user) }
       it 'deletes the question' do
-        expect { expect { delete :destroy, params: { id: question } }.to change(Question, :count).by(-1) }
+        expect { delete :destroy, params: { id: question } }.to change(Question, :count).by(-1)
       end
 
       it 'redirects to index' do
@@ -124,13 +124,17 @@ RSpec.describe QuestionsController, type: :controller do
     end
 
     context 'The user deletes not his question' do
+
+      let(:question) { create(:question, user_id: user.id) }
       let(:not_author) { create(:user) }
       before { login(not_author) }
 
       it 'deletes the question' do
-        expect { expect { delete :destroy, params: { id: question } }.to change(Question, :count).by(0) }
+        expect { delete :destroy, params: { id: question } }.to_not change(Question, :count)
+        expect(response).to have_http_status(:forbidden)
       end
     end
+
 
 
   end

@@ -17,7 +17,8 @@ class AnswersController < ApplicationController
     @answer = @question.answers.new(answer_params)
     @answer.author = current_user
     if @answer.save
-      redirect_to @answer, notice: 'Your answer successfully created.'
+      #redirect_to @answer, notice: 'Your answer successfully created.'
+      redirect_to @question, notice: 'Your answer successfully created.'
     else
       redirect_to @question, notice: "Answer can't be blank."
     end
@@ -33,9 +34,11 @@ class AnswersController < ApplicationController
   end
 
   def destroy
-    if User.author_of?(current_user, @answer)
+    if current_user.author_of?(@answer)
       @answer.destroy
       redirect_to question_path(@answer.question)
+    else
+      head :forbidden
     end
   end
 

@@ -35,9 +35,11 @@ class QuestionsController < ApplicationController
   end
 
   def destroy
-    if User.author_of?(current_user, @question)
+    if current_user.author_of?(@question)
       @question.destroy
       redirect_to questions_path
+    else
+      head :forbidden
     end
   end
 

@@ -16,8 +16,7 @@ feature 'User can create answer', %q{
     scenario 'add a answer' do
       fill_in 'Text', with: 'New answer'
       click_on 'Add answer'
-
-      expect(page).to have_content 'Your answer successfully created.'
+      expect(page).to have_content 'New answer'
     end
 
     scenario 'add a answer with errors ' do
