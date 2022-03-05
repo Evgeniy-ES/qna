@@ -131,7 +131,11 @@ RSpec.describe QuestionsController, type: :controller do
 
       it 'deletes the question' do
         expect { delete :destroy, params: { id: question } }.to_not change(Question, :count)
-        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'redirect to question' do
+        delete :destroy, params: { id: question }
+        expect(response).to redirect_to question
       end
     end
 

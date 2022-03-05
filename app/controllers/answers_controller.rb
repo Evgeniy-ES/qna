@@ -17,7 +17,6 @@ class AnswersController < ApplicationController
     @answer = @question.answers.new(answer_params)
     @answer.author = current_user
     if @answer.save
-      #redirect_to @answer, notice: 'Your answer successfully created.'
       redirect_to @question, notice: 'Your answer successfully created.'
     else
       redirect_to @question, notice: "Answer can't be blank."
@@ -38,7 +37,7 @@ class AnswersController < ApplicationController
       @answer.destroy
       redirect_to question_path(@answer.question)
     else
-      head :forbidden
+      redirect_to question_path(@answer.question)
     end
   end
 

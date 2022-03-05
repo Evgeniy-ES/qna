@@ -109,7 +109,7 @@ RSpec.describe AnswersController, type: :controller do
         expect{ delete :destroy, params: { question_id: question, id: answer } }.to change(question.answers, :count).by(-1)
       end
 
-      it 'redirect to index' do
+      it 'redirect to answer' do
         delete :destroy, params: { question_id: question, id: answer }
         expect(response).to redirect_to answer.question
       end
@@ -121,7 +121,11 @@ RSpec.describe AnswersController, type: :controller do
 
       it 'deletes the answer' do
         expect{ delete :destroy, params: { question_id: question, id: answer } }.to_not change(question.answers, :count)
-        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'redirect to question' do
+        delete :destroy, params: { question_id: question, id: answer }
+        expect(response).to redirect_to question
       end
     end
 

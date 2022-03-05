@@ -23,9 +23,6 @@ feature 'User can create answer', %q{
       click_on 'Add answer'
       expect(page).to have_content "Answer can't be blank."
     end
-
-    scenario 'list answers' do
-    end
   end
 
   scenario 'Unauthenticated user' do

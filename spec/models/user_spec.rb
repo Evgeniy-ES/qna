@@ -19,11 +19,11 @@ RSpec.describe User, type: :model do
     let(:question) { create(:question, author: author)}
 
     it 'current_user == author data' do
-      expect(author.author_of?(question)).to_not be_falsey
+      expect(author).to be_author_of(question)
     end
 
     it 'current_user != author data' do
-      expect(user.author_of?(question)).to be_falsey
+      expect(user).to_not be_author_of(question)
     end
 
   end

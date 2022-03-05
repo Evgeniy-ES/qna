@@ -39,7 +39,7 @@ class QuestionsController < ApplicationController
       @question.destroy
       redirect_to questions_path
     else
-      head :forbidden
+      redirect_to question_path
     end
   end
 
