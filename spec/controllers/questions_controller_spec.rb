@@ -1,10 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe QuestionsController, type: :controller do
-  let(:question) { create(:question) }
+  let(:user) { create(:user) }
+  let(:question) { create(:question, author: user) }
 
   describe 'GET #index' do
-    let(:questions) { create_list(:question, 3) }
+    let(:questions) { create_list(:question, 3, author: user) }
 
     before  { get :index }
     it 'populates an array of all questions' do
@@ -27,16 +28,18 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'GET #new' do
+    before { login(user) }
+
     before { get :new }
 
-    it 'renders show new' do
+    it 'renders new view' do
       expect(response).to render_template :new
     end
   end
 
   describe 'GET #edit' do
+    before { login(user) }
     before { get :edit, params: { id: question } }
-
 
     it 'renders edit view' do
       expect(response).to render_template :edit
@@ -44,12 +47,14 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'POST #create' do
+    before { login(user) }
+
     context 'with valid atributes' do
       it 'saves a new question in the database' do
-        expect { post :create, params: { question: attributes_for(:question) } }.to change(Question, :count).by(1)
+        expect { post :create, params: { question: attributes_for(:question), author: user } }.to change(Question, :count).by(1)
       end
       it 'redirect to show view' do
-        post :create, params: { question: attributes_for(:question) }
+        post :create, params: { question: attributes_for(:question), author: user }
         expect(response).to redirect_to assigns(:question)
       end
     end
@@ -65,7 +70,8 @@ RSpec.describe QuestionsController, type: :controller do
     end
   end
 
-  describe 'PATCH #create' do
+  describe 'PATCH #update' do
+    before { login(user) }
     context 'with valid atributes' do
       it 'assigns the requested question to @question' do
         patch :update, params: {id: question, question: attributes_for(:question) }
@@ -103,15 +109,37 @@ RSpec.describe QuestionsController, type: :controller do
   end
 
   describe 'DELETE #destroy' do
-    let!(:question) { create(:question) }
-    it 'deletes the question' do
-      expect { expect { delete :destroy, params: { id: question } }.to change(Question, :count).by(-1) }
+    let!(:question) { create(:question, user_id: user.id) }
+
+    context 'The author deletes his question' do
+      before { login(user) }
+      it 'deletes the question' do
+        expect { delete :destroy, params: { id: question } }.to change(Question, :count).by(-1)
+      end
+
+      it 'redirects to index' do
+        delete :destroy, params: { id: question }
+        expect(response).to redirect_to questions_path
+      end
     end
 
-    it 'redirects to index' do
-      delete :destroy, params: { id: question }
-      expect(response).to redirect_to questions_path
+    context 'The user deletes not his question' do
+
+      let(:question) { create(:question, user_id: user.id) }
+      let(:not_author) { create(:user) }
+      before { login(not_author) }
+
+      it 'deletes the question' do
+        expect { delete :destroy, params: { id: question } }.to_not change(Question, :count)
+      end
+
+      it 'redirect to question' do
+        delete :destroy, params: { id: question }
+        expect(response).to redirect_to question
+      end
     end
+
+
 
   end
 end
