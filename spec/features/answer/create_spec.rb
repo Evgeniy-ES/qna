@@ -7,7 +7,7 @@ feature 'User can create answer', %q{
   given!(:user) { create(:user) }
   given!(:question) { create(:question, author: user) }
 
-  describe 'Authenticated user' do
+  describe 'Authenticated user', js: true do
     background do
       sign_in(user)
       visit question_path(question)
@@ -16,6 +16,7 @@ feature 'User can create answer', %q{
     scenario 'add a answer' do
       fill_in 'Text', with: 'New answer'
       click_on 'Add answer'
+      expect(current_path).to eq question_path(question)
       expect(page).to have_content 'New answer'
     end
 
@@ -23,6 +24,7 @@ feature 'User can create answer', %q{
       click_on 'Add answer'
       expect(page).to have_content "Answer can't be blank."
     end
+
   end
 
   scenario 'Unauthenticated user' do
