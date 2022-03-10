@@ -5,11 +5,13 @@ br
     = link_to 'Delete the question', question_path(@question), method: :delete
 
     br
+      .answer-errors
+        = render 'shared/errors', resource: @answer
       - question.answers.each do |answer|
         div
           = answer.text
           - if current_user.author_of?(answer)
             = link_to 'Delete the answer', answer_path(answer), method: :delete
 
-= render 'shared/errors', resource: @answer
+
 = render 'answers/form', question: question
