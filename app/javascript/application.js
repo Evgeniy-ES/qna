@@ -2,11 +2,18 @@
 import Rails from "@rails/ujs"
 import Turbolinks from "turbolinks"
 import * as ActiveStorage from "@rails/activestorage"
+import "bootstrap"
 import "channels"
 import "./answers"
 import "./questions"
 
+require("@rails/ujs").start()
+require("turbolinks").start()
+require("@rails/activestorage").start()
+require("channels").start()
+require("pack/custom").start()
+require("pack/posts.js").start()
+
 Rails.start()
-Turbolinks.start()
-ActiveStorage.start()
+
 require('jquery')
